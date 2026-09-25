@@ -4,6 +4,7 @@ Product Safety Intelligence
 
 IngredientIQ is a web application that analyzes cosmetic and personal-care product ingredients and presents safety information, profile-based warnings, and product grading.
 
+
 Features
 
 1. Manual barcode entry
@@ -19,6 +20,7 @@ Features
 6. Product safety score and A–F grade
 
 7. Ingredient-level details and safety distribution
+   
 
 Architecture
 
@@ -63,6 +65,7 @@ Architecture
                                    │ Details / Warnings  │
                                    │ Distribution / Grade│
                                    └─────────────────────┘
+                                   
 
 How It Works
 
@@ -75,6 +78,7 @@ Normalize and classify the ingredients.
 Check selected profiles for relevant warnings.
 
 Generate the product score, grade, and analysis results.
+
 
 Tech Stack
 
@@ -108,41 +112,41 @@ OpenFoodFacts API
 
 Trained safety classification model
 
-Project Structure
 
-## Project Structure
+Project Structure
 
 ```text
 ┌──────────────────────────────────────────────┐
-│              IngredientIQ/                  │
+│              IngredientIQ/                   │
 ├──────────────────────────────────────────────┤
-│ 1. data/                                    │
-│    └── reference/                           │
-│        ├── ingredient_safety.parquet        │
-│        └── inci_synonyms.parquet            │
+│ 1. data/                                     │
+│    └── reference/                            │
+│        ├── ingredient_safety.parquet         │
+│        └── inci_synonyms.parquet             │
 │                                              │
-│ 2. frontend/                                │
-│    └── react-app/                           │
-│        ├── src/                             │
-│        ├── package.json                     │
-│        └── package-lock.json                │
+│ 2. frontend/                                 │
+│    └── react-app/                            │
+│        ├── src/                              │
+│        ├── package.json                      │
+│        └── package-lock.json                 │ 
 │                                              │
-│ 3. models/                                  │
-│    └── safety_classifier.pkl                │
+│ 3. models/                                   │
+│    └── safety_classifier.pkl                 │
 │                                              │
-│ 4. pipeline/                                │
-│ 5. src/                                     │
-│    └── api/                                 │
-│ 6. tests/                                   │
-│ 7. .env.example                             │
-│ 8. .gitignore                               │
-│ 9. Dockerfile                               │
-│10. render.yaml                              │
+│ 4. pipeline/                                 │
+│ 5. src/                                      │
+│    └── api/                                  │
+│ 6. tests/                                    │ 
+│ 7. .env.example                              │
+│ 8. .gitignore                                │
+│ 9. Dockerfile                                │
+│10. render.yaml                               │
 │11. requirements.txt                          │
 │12. run_pipeline.py                           │
-│13. README.md                                │
+│13. README.md                                 │
 └──────────────────────────────────────────────┘
 ```
+
 
 Setup
 
@@ -234,6 +238,7 @@ Get grading information
 
 API documentation: http://localhost:8000/docs
 
+
 Data and Model
 
 ingredient_safety.parquet — ingredient safety reference data
@@ -262,18 +267,16 @@ Dockerfile — container configuration
 
 render.yaml — Render deployment configuration
 
+
 Future Enhancements
 
-Camera-based barcode scanning
+1. Camera-based barcode scanning
 
-OCR-based ingredient extraction
+2. OCR-based ingredient extraction
 
-Expanded ingredient reference data
+3. Expanded ingredient reference data
 
-Additional personalization profiles
+4. Additional personalization profiles
 
-Improved product coverage
+5. Improved product coverage
 
-License
-
-This project is provided for educational and research purposes.

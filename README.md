@@ -2,62 +2,79 @@ IngredientIQ
 
 Product Safety Intelligence
 
-IngredientIQ is a web application that analyzes cosmetic and personal-care product ingredients and presents safety information in a simple, profile-aware format.
+IngredientIQ is a web application that analyzes cosmetic and personal-care product ingredients and presents safety information, profile-based warnings, and product grading.
 
 Features
 
-Manual barcode entry for product lookup
+1. Manual barcode entry
 
-Ingredient-list analysis
+2. Ingredient-list analysis
 
-Ingredient normalization and safety classification
+3. Ingredient normalization
 
-Profile-aware warnings
+4. Safety classification
 
-Product safety score and A–F grade
+5. Profile-based warnings
 
-Ingredient-level details and safety distribution
+6. Product safety score and A–F grade
 
-REST API powered by FastAPI
-
-React-based frontend
+7. Ingredient-level details and safety distribution
 
 Architecture
 
-User
-  │
-  ▼
-React Frontend
-  │
-  ▼
-FastAPI REST API
-  │
-  ├── Product Lookup
-  │     └── OpenBeautyFacts / OpenFoodFacts
-  │
-  ├── Ingredient Processing
-  │     ├── Normalization
-  │     ├── Reference Data
-  │     └── Safety Classification
-  │
-  ├── Profile Matcher
-  │
-  └── Product Scorer
-        │
-        ▼
-   Analysis Results
+                         ┌─────────────────────┐
+                         │        User         │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   React Frontend    │
+                         │      + Vite         │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │   FastAPI Backend   │
+                         └──────────┬──────────┘
+                                    │
+              ┌─────────────────────┼─────────────────────┐
+              │                     │                     │
+              ▼                     ▼                     ▼
+     ┌────────────────┐    ┌────────────────┐    ┌────────────────┐
+     │ Product Lookup │    │ Ingredient     │    │ Profile        │
+     │                │    │ Processing     │    │ Matcher        │
+     └───────┬────────┘    └───────┬────────┘    └───────┬────────┘
+             │                     │                     │
+             ▼                     ▼                     │
+     ┌────────────────┐    ┌────────────────┐             │
+     │ OpenBeautyFacts│    │ Reference Data │             │
+     │ OpenFoodFacts  │    │ Safety Model   │             │
+     └────────────────┘    └───────┬────────┘             │
+                                   │                      │
+                                   └──────────┬───────────┘
+                                              ▼
+                                   ┌─────────────────────┐
+                                   │   Product Scorer    │
+                                   └──────────┬──────────┘
+                                              │
+                                              ▼
+                                   ┌─────────────────────┐
+                                   │   Analysis Results  │
+                                   │ Details / Warnings  │
+                                   │ Distribution / Grade│
+                                   └─────────────────────┘
 
 How It Works
 
-Enter a barcode or ingredient list.
+Enter a product barcode or ingredient list.
 
-IngredientIQ retrieves or processes the ingredient data.
+Retrieve or process the ingredient data.
 
-Ingredients are normalized and classified using the local reference data and model.
+Normalize and classify the ingredients.
 
-Selected user profiles are checked for relevant warnings.
+Check selected profiles for relevant warnings.
 
-The application returns ingredient details, safety distribution, warnings, and an overall product grade.
+Generate the product score, grade, and analysis results.
 
 Tech Stack
 
@@ -75,75 +92,103 @@ Python
 
 FastAPI
 
-Scikit-learn
-
 Pandas
 
 NumPy
+
+Scikit-learn
 
 Data
 
 Parquet reference datasets
 
-OpenBeautyFacts / OpenFoodFacts APIs
+OpenBeautyFacts API
+
+OpenFoodFacts API
 
 Trained safety classification model
 
 Project Structure
 
-IngredientIQ/
-├── data/
-│   └── reference/
-├── frontend/
-│   └── react-app/
-├── models/
-├── pipeline/
-├── src/
-│   └── api/
-├── tests/
-├── .env.example
-├── Dockerfile
-├── render.yaml
-├── requirements.txt
-└── run_pipeline.py
+## Project Structure
+
+```text
+┌──────────────────────────────────────────────┐
+│              IngredientIQ/                  │
+├──────────────────────────────────────────────┤
+│ 1. data/                                    │
+│    └── reference/                           │
+│        ├── ingredient_safety.parquet        │
+│        └── inci_synonyms.parquet            │
+│                                              │
+│ 2. frontend/                                │
+│    └── react-app/                           │
+│        ├── src/                             │
+│        ├── package.json                     │
+│        └── package-lock.json                │
+│                                              │
+│ 3. models/                                  │
+│    └── safety_classifier.pkl                │
+│                                              │
+│ 4. pipeline/                                │
+│ 5. src/                                     │
+│    └── api/                                 │
+│ 6. tests/                                   │
+│ 7. .env.example                             │
+│ 8. .gitignore                               │
+│ 9. Dockerfile                               │
+│10. render.yaml                              │
+│11. requirements.txt                          │
+│12. run_pipeline.py                           │
+│13. README.md                                │
+└──────────────────────────────────────────────┘
+```
 
 Setup
 
-1. Clone the repository
+Backend
+
+Clone the repository.
 
 git clone <repository-url>
 cd IngredientIQ
 
-2. Backend
-
-Create and activate a virtual environment:
+Create and activate a virtual environment.
 
 python -m venv venv
 venv\Scripts\activate
 
-Install dependencies:
+Install dependencies.
 
 pip install -r requirements.txt
 
-Start the API:
+Start the API.
 
 uvicorn src.api.main:app --reload
 
-The backend runs at http://localhost:8000.
+Backend: http://localhost:8000
 
-3. Frontend
+Frontend
+
+Open the frontend directory.
 
 cd frontend/react-app
+
+Install dependencies.
+
 npm install
+
+Start the development server.
+
 npm run dev
 
-The frontend runs at http://localhost:3000.
+Frontend: http://localhost:3000
 
-Set the API URL in frontend/react-app/.env:
+Create frontend/react-app/.env.
 
 VITE_API_URL=http://127.0.0.1:8000
 
-API Endpoints
+API
 
 Method
 
@@ -155,7 +200,7 @@ GET
 
 /health
 
-API health check
+Health check
 
 POST
 
@@ -179,43 +224,43 @@ GET
 
 /profiles
 
-Get supported user profiles
+Get supported profiles
 
 GET
 
 /grades
 
-Get product grading information
+Get grading information
 
-Interactive API documentation is available at:
-
-http://localhost:8000/docs
+API documentation: http://localhost:8000/docs
 
 Data and Model
 
-IngredientIQ uses:
+ingredient_safety.parquet — ingredient safety reference data
 
-data/reference/ingredient_safety.parquet
+inci_synonyms.parquet — ingredient name normalization
 
-data/reference/inci_synonyms.parquet
+safety_classifier.pkl — safety classification model
 
-models/safety_classifier.pkl
-
-External product information can be retrieved from OpenBeautyFacts and OpenFoodFacts when available.
+OpenBeautyFacts and OpenFoodFacts — external product information
 
 Current Scope
 
-IngredientIQ currently supports manual barcode entry and ingredient-list analysis. It does not require a camera-based barcode scanner.
+Manual barcode entry is supported.
 
-Results are intended as informational product-safety guidance and should not replace professional medical or dietary advice.
+Ingredient-list analysis is supported.
+
+Camera-based barcode scanning is not part of the current implementation.
+
+OCR-based ingredient extraction is not part of the current implementation.
+
+Results are informational and should not replace professional medical or dietary advice.
 
 Deployment
 
-The repository includes:
+Dockerfile — container configuration
 
-Dockerfile for containerized deployment
-
-render.yaml for Render deployment configuration
+render.yaml — Render deployment configuration
 
 Future Enhancements
 

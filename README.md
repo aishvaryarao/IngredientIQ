@@ -32,22 +32,6 @@ REST API with FastAPI
 
 React-based web interface
 
-Supported Profiles
-
-Sensitive Skin
-
-Pregnancy
-
-Diabetic
-
-Vegan
-
-Nut Allergy
-
-Fragrance Allergy
-
-Acne-Prone
-
 Architecture
 
                          USER

@@ -15,10 +15,10 @@ export function Navbar() {
   }, []);
 
   const navItems = [
-    { label: '🏠 Home', path: '/' },
-    { label: '🔍 Barcode', path: '/barcode' },
-    { label: '📋 Ingredients', path: '/ingredients' },
-    { label: '📷 Photo', path: '/photo' },
+    { label: 'Home', path: '/' },
+    { label: 'Barcode', path: '/barcode' },
+    { label: 'Ingredients', path: '/ingredients' },
+    { label: 'Photo', path: '/photo' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -50,7 +50,7 @@ export function Navbar() {
           marginRight: '32px',
         }}
       >
-        <span style={{ fontSize: '24px' }}>🔬</span>
+        <span style={{ fontSize: '24px' }}></span>
         <span
           style={{
             fontSize: '20px',

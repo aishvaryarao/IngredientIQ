@@ -129,7 +129,7 @@ function PhotoScanner() {
             {imagePreview ? (
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: '#334155' }}>
-                  ✅ Image selected
+                  Image selected
                 </p>
                 <p style={{ fontSize: '12px', color: '#64748b' }}>Click to change image</p>
               </div>
@@ -226,7 +226,7 @@ function PhotoScanner() {
             }
           }}
         >
-          {loading ? '🔄 Extracting Text...' : '✨ Extract & Analyze'}
+          {loading ? ' Extracting Text...' : ' Extract & Analyze'}
         </button>
       </div>
 

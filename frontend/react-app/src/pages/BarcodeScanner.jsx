@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProfileContext } from '../App';
 import { scanBarcode } from '../api/client';
@@ -8,12 +8,25 @@ import WarningCard from '../components/WarningCard';
 import GradeBadge from '../components/GradeBadge';
 
 function BarcodeScanner() {
-  const { profiles, selectedProfiles, setSelectedProfiles } = useContext(ProfileContext);
+  const { profiles, selectedProfiles, setSelectedProfiles } =
+    useContext(ProfileContext);
+
   const [searchParams] = useSearchParams();
   const [barcode, setBarcode] = useState(searchParams.get('barcode') || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+
+  const colors = {
+    background: '#F4EDE3',
+    surface: '#FBF8F3',
+    espresso: '#3A2921',
+    deepEspresso: '#291B16',
+    muted: '#795F52',
+    border: '#DCCFC2',
+    soft: '#EDE1D4',
+    disabled: '#C9BDB2',
+  };
 
   const handleAnalyze = async () => {
     if (!barcode.trim()) {
@@ -37,7 +50,9 @@ function BarcodeScanner() {
 
   const handleProfileToggle = (profileId) => {
     setSelectedProfiles((prev) =>
-      prev.includes(profileId) ? prev.filter((p) => p !== profileId) : [...prev, profileId]
+      prev.includes(profileId)
+        ? prev.filter((p) => p !== profileId)
+        : [...prev, profileId]
     );
   };
 
@@ -52,27 +67,62 @@ function BarcodeScanner() {
       style={{
         display: 'flex',
         minHeight: 'calc(100vh - 64px)',
-        backgroundColor: '#f8fafc',
+        backgroundColor: colors.background,
       }}
     >
-      {/* Left Panel: Input (40%) */}
+      {/* Left Panel */}
       <div
         style={{
           flex: '0 0 40%',
           padding: '40px',
-          backgroundColor: 'white',
-          borderRight: '1px solid #e2e8f0',
+          backgroundColor: colors.surface,
+          borderRight: `1px solid ${colors.border}`,
           overflowY: 'auto',
           maxHeight: 'calc(100vh - 64px)',
         }}
       >
-        <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '32px' }}>🔍 Barcode Scanner</h1>
+        <div
+          style={{
+            display: 'inline-block',
+            padding: '6px 14px',
+            marginBottom: '16px',
+            borderRadius: '20px',
+            backgroundColor: colors.soft,
+            color: colors.muted,
+            fontSize: '12px',
+            fontWeight: 600,
+            letterSpacing: '0.4px',
+          }}
+        >
+          PRODUCT ANALYSIS
+        </div>
+
+        <h1
+          style={{
+            fontSize: '30px',
+            fontWeight: 700,
+            marginBottom: '32px',
+            color: colors.deepEspresso,
+            letterSpacing: '-0.5px',
+          }}
+        >
+          Barcode Entry
+        </h1>
 
         {/* Barcode Input */}
         <div style={{ marginBottom: '32px' }}>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#334155' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginBottom: '8px',
+              color: colors.espresso,
+            }}
+          >
             Product Barcode
           </label>
+
           <input
             type="text"
             value={barcode}
@@ -81,45 +131,93 @@ function BarcodeScanner() {
             placeholder="e.g., 5010724154018"
             style={{
               width: '100%',
-              padding: '12px',
+              padding: '13px 14px',
               borderRadius: '8px',
-              border: '1px solid #cbd5e1',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: '#FFFFFF',
+              color: colors.espresso,
               fontSize: '14px',
               boxSizing: 'border-box',
+              outline: 'none',
             }}
           />
-          <p style={{ fontSize: '12px', color: '#64748b', marginTop: '6px' }}>
-            Find barcodes on product packaging (usually 12-14 digits)
+
+          <p
+            style={{
+              fontSize: '12px',
+              color: colors.muted,
+              marginTop: '7px',
+              lineHeight: 1.5,
+            }}
+          >
+            Find the barcode on your product packaging, usually 12–14 digits.
           </p>
         </div>
 
         {/* Profile Selection */}
         <div style={{ marginBottom: '32px' }}>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#334155' }}>
-            Your Health Profile (Select All That Apply)
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginBottom: '12px',
+              color: colors.espresso,
+            }}
+          >
+            Your Health Profile
           </label>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+          <p
+            style={{
+              fontSize: '12px',
+              color: colors.muted,
+              marginBottom: '12px',
+            }}
+          >
+            Select all that apply.
+          </p>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+            }}
+          >
             {profiles.map((profile) => (
               <label
                 key={profile.id}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px',
-                  borderRadius: '6px',
+                  gap: '10px',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  backgroundColor: selectedProfiles.includes(profile.id) ? '#eef2ff' : 'transparent',
-                  transition: 'background-color 0.2s',
+                  backgroundColor: selectedProfiles.includes(profile.id)
+                    ? colors.soft
+                    : 'transparent',
+                  border: selectedProfiles.includes(profile.id)
+                    ? `1px solid ${colors.border}`
+                    : '1px solid transparent',
+                  transition: 'all 0.2s ease',
+                  color: colors.espresso,
                 }}
               >
                 <input
                   type="checkbox"
                   checked={selectedProfiles.includes(profile.id)}
                   onChange={() => handleProfileToggle(profile.id)}
-                  style={{ cursor: 'pointer' }}
+                  style={{
+                    cursor: 'pointer',
+                    accentColor: colors.espresso,
+                  }}
                 />
-                <span style={{ fontSize: '14px' }}>{profile.label}</span>
+
+                <span style={{ fontSize: '14px', fontWeight: 500 }}>
+                  {profile.label}
+                </span>
               </label>
             ))}
           </div>
@@ -131,34 +229,34 @@ function BarcodeScanner() {
           disabled={loading}
           style={{
             width: '100%',
-            padding: '12px',
-            backgroundColor: loading ? '#cbd5e1' : '#6366f1',
-            color: 'white',
+            padding: '14px',
+            backgroundColor: loading ? colors.disabled : colors.espresso,
+            color: colors.surface,
             border: 'none',
             borderRadius: '8px',
-            fontSize: '16px',
+            fontSize: '15px',
             fontWeight: 600,
             cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
             if (!loading) {
-              e.target.style.backgroundColor = '#4f46e5';
-              e.target.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.backgroundColor = colors.deepEspresso;
+              e.currentTarget.style.transform = 'translateY(-1px)';
             }
           }}
           onMouseLeave={(e) => {
             if (!loading) {
-              e.target.style.backgroundColor = '#6366f1';
-              e.target.style.transform = 'translateY(0)';
+              e.currentTarget.style.backgroundColor = colors.espresso;
+              e.currentTarget.style.transform = 'translateY(0)';
             }
           }}
         >
-          {loading ? '🔄 Analyzing...' : '🔍 Analyze Product'}
+          {loading ? 'Analyzing...' : 'Analyze Product'}
         </button>
       </div>
 
-      {/* Right Panel: Results (60%) */}
+      {/* Right Panel */}
       <div
         style={{
           flex: '0 0 60%',
@@ -167,50 +265,111 @@ function BarcodeScanner() {
           maxHeight: 'calc(100vh - 64px)',
         }}
       >
+        {/* Error */}
         {error && (
           <div
             style={{
               padding: '16px',
-              backgroundColor: '#fee2e2',
-              borderLeft: '4px solid #ef4444',
+              backgroundColor: '#FCE8E6',
+              borderLeft: '4px solid #B94A48',
               borderRadius: '8px',
               marginBottom: '24px',
             }}
           >
-            <p style={{ margin: 0, color: '#991b1b', fontSize: '14px' }}>❌ {error}</p>
+            <p
+              style={{
+                margin: 0,
+                color: '#8A302E',
+                fontSize: '14px',
+              }}
+            >
+              {error}
+            </p>
           </div>
         )}
 
+        {/* Loading */}
         {loading && (
-          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '60px 20px',
+            }}
+          >
             <div
               style={{
                 width: '40px',
                 height: '40px',
-                border: '3px solid #e2e8f0',
-                borderTop: '3px solid #6366f1',
+                border: `3px solid ${colors.border}`,
+                borderTop: `3px solid ${colors.espresso}`,
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite',
                 margin: '0 auto 16px',
               }}
             />
-            <p style={{ color: '#64748b', fontSize: '16px' }}>Analyzing product...</p>
+
+            <p
+              style={{
+                color: colors.muted,
+                fontSize: '16px',
+              }}
+            >
+              Analyzing product...
+            </p>
           </div>
         )}
 
+        {/* Results */}
         {result && (
           <div>
             {/* Product Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '32px',
+                gap: '20px',
+              }}
+            >
               <div>
-                <h2 style={{ fontSize: '28px', fontWeight: 700, margin: '0 0 8px 0' }}>
+                <h2
+                  style={{
+                    fontSize: '28px',
+                    fontWeight: 700,
+                    margin: '0 0 8px 0',
+                    color: colors.deepEspresso,
+                  }}
+                >
                   {result.product_name || 'Unknown Product'}
                 </h2>
-                <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                  Barcode: <code style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{barcode}</code>
+
+                <p
+                  style={{
+                    fontSize: '14px',
+                    color: colors.muted,
+                    margin: 0,
+                  }}
+                >
+                  Barcode:{' '}
+                  <code
+                    style={{
+                      backgroundColor: colors.soft,
+                      color: colors.espresso,
+                      padding: '3px 7px',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    {barcode}
+                  </code>
                 </p>
               </div>
-              <GradeBadge grade={result.grade} size="lg" score={result.safety_score} />
+
+              <GradeBadge
+                grade={result.grade}
+                size="lg"
+                score={result.safety_score}
+              />
             </div>
 
             {/* Charts */}
@@ -223,8 +382,24 @@ function BarcodeScanner() {
             {/* Warnings */}
             {result.warnings && result.warnings.length > 0 && (
               <div style={{ marginBottom: '32px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>Warnings</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    marginBottom: '16px',
+                    color: colors.espresso,
+                  }}
+                >
+                  Warnings
+                </h3>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                  }}
+                >
                   {result.warnings.map((warning, idx) => (
                     <WarningCard key={idx} warning={warning} />
                   ))}
@@ -235,18 +410,30 @@ function BarcodeScanner() {
             {/* Ingredients */}
             {result.ingredients && result.ingredients.length > 0 && (
               <div>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    marginBottom: '16px',
+                    color: colors.espresso,
+                  }}
+                >
                   All Ingredients ({result.ingredients.length})
                 </h3>
+
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gridTemplateColumns:
+                      'repeat(auto-fill, minmax(300px, 1fr))',
                     gap: '16px',
                   }}
                 >
                   {result.ingredients.map((ingredient, idx) => (
-                    <IngredientCard key={idx} ingredient={ingredient} />
+                    <IngredientCard
+                      key={idx}
+                      ingredient={ingredient}
+                    />
                   ))}
                 </div>
               </div>
@@ -254,16 +441,63 @@ function BarcodeScanner() {
           </div>
         )}
 
+        {/* Empty State */}
         {!result && !loading && !error && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-            <p style={{ fontSize: '16px' }}>Enter a barcode and click "Analyze Product" to get started</p>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '100px 20px',
+              color: colors.muted,
+            }}
+          >
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                margin: '0 auto 24px',
+                borderRadius: '50%',
+                backgroundColor: colors.soft,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.espresso,
+                fontSize: '24px',
+                fontWeight: 600,
+              }}
+            >
+              IQ
+            </div>
+
+            <h3
+              style={{
+                color: colors.espresso,
+                fontSize: '20px',
+                marginBottom: '8px',
+              }}
+            >
+              Ready to analyze
+            </h3>
+
+            <p
+              style={{
+                fontSize: '14px',
+                maxWidth: '380px',
+                margin: '0 auto',
+                lineHeight: 1.6,
+              }}
+            >
+              Enter a product barcode and analyze its ingredients and safety
+              profile.
+            </p>
           </div>
         )}
       </div>
 
       <style>{`
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </div>

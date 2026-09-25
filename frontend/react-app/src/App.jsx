@@ -14,29 +14,40 @@ function AppContent() {
   const [selectedProfiles, setSelectedProfiles] = useState([]);
 
   const profiles = [
-    { id: 'SENSITIVE_SKIN', label: '😢 Sensitive Skin' },
-    { id: 'PREGNANT', label: '🤰 Pregnant' },
-    { id: 'DIABETIC', label: '🩺 Diabetic' },
-    { id: 'VEGAN', label: '🌱 Vegan' },
-    { id: 'NUT_ALLERGY', label: '🥜 Nut Allergy' },
-    { id: 'FRAGRANCE_ALLERGY', label: '👃 Fragrance Allergy' },
-    { id: 'ACNE_PRONE', label: '🧴 Acne-Prone' },
+    { id: 'SENSITIVE_SKIN', label: 'Sensitive Skin' },
+    { id: 'PREGNANT', label: 'Pregnancy' },
+    { id: 'DIABETIC', label: 'Diabetic' },
+    { id: 'VEGAN', label: 'Vegan' },
+    { id: 'NUT_ALLERGY', label: 'Nut Allergy' },
+    { id: 'FRAGRANCE_ALLERGY', label: 'Fragrance Allergy' },
+    { id: 'ACNE_PRONE', label: 'Acne-Prone' },
   ];
 
   return (
-    <ProfileContext.Provider value={{ selectedProfiles, setSelectedProfiles, profiles }}>
+    <ProfileContext.Provider
+      value={{
+        selectedProfiles,
+        setSelectedProfiles,
+        profiles,
+      }}
+    >
       <Routes>
         <Route path="/" element={<Landing />} />
+
         <Route
           path="*"
           element={
             <>
               <Navbar />
+
               <div style={{ paddingTop: '64px' }}>
                 <Routes>
                   <Route path="/home" element={<Home />} />
                   <Route path="/barcode" element={<BarcodeScanner />} />
-                  <Route path="/ingredient-checker" element={<IngredientChecker />} />
+                  <Route
+                    path="/ingredient-checker"
+                    element={<IngredientChecker />}
+                  />
                   <Route path="/photo" element={<PhotoScanner />} />
                 </Routes>
               </div>

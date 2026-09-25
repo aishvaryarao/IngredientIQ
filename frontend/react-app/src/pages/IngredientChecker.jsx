@@ -2,21 +2,45 @@ import { useContext, useState } from 'react';
 import { ProfileContext } from '../App';
 import { analyzeIngredients } from '../api/client';
 import IngredientCard from '../components/IngredientCard';
-import WarningCard from '../components/WarningCard';
 import GradeBadge from '../components/GradeBadge';
 
 function IngredientChecker() {
-  const { profiles, selectedProfiles, setSelectedProfiles } = useContext(ProfileContext);
+  const {
+    profiles,
+    selectedProfiles,
+    setSelectedProfiles,
+  } = useContext(ProfileContext);
+
   const [ingredientText, setIngredientText] = useState('');
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
+  const colors = {
+    background: '#F4EDE3',
+    surface: '#FBF8F3',
+    espresso: '#3A2921',
+    deepEspresso: '#291B16',
+    muted: '#795F52',
+    border: '#DCCFC2',
+    soft: '#EDE1D4',
+    disabled: '#C9BDB2',
+  };
+
   const exampleIngredients = [
-    { name: 'Water, Glycerin, Cetyl Alcohol, Stearic Acid, Petrolatum', label: 'Basic Moisturizer' },
-    { name: 'Water, Butylene Glycol, Niacinamide, Mica, CI 77891', label: 'Tinted Serum' },
-    { name: 'Aqua, Paraben, Lead Acetate, Titanium Dioxide, Talc', label: 'Budget Powder' },
+    {
+      name: 'Water, Glycerin, Cetyl Alcohol, Stearic Acid, Petrolatum',
+      label: 'Basic Moisturizer',
+    },
+    {
+      name: 'Water, Butylene Glycol, Niacinamide, Mica, CI 77891',
+      label: 'Tinted Serum',
+    },
+    {
+      name: 'Aqua, Paraben, Lead Acetate, Titanium Dioxide, Talc',
+      label: 'Budget Powder',
+    },
   ];
 
   const handleAnalyze = async () => {
@@ -30,14 +54,12 @@ function IngredientChecker() {
     setResult(null);
     setProgress(0);
 
-    const ingredients = ingredientText
-      .split(',')
-      .map((ing) => ing.trim())
-      .filter((ing) => ing.length > 0);
-
-    // Single batch call instead of N+1 individual calls
     setProgress(50);
-    const response = await analyzeIngredients(ingredientText, selectedProfiles);
+
+    const response = await analyzeIngredients(
+      ingredientText,
+      selectedProfiles
+    );
 
     if (response.error || !response.data) {
       setError(response.error || 'Failed to analyze ingredients');
@@ -47,28 +69,49 @@ function IngredientChecker() {
 
     const allResults = response.data.ingredients || [];
     const warnings = response.data.warnings || [];
+
     let totalScore = 0;
-    let hazardousCounts = { SAFE: 0, MODERATE: 0, HAZARDOUS: 0 };
+
+    const hazardousCounts = {
+      SAFE: 0,
+      MODERATE: 0,
+      HAZARDOUS: 0,
+    };
 
     for (const ingredient of allResults) {
       totalScore += ingredient.ewg_score || 0;
+
       const safetyLabel = ingredient.safety_label;
-      hazardousCounts[safetyLabel] = (hazardousCounts[safetyLabel] || 0) + 1;
+
+      hazardousCounts[safetyLabel] =
+        (hazardousCounts[safetyLabel] || 0) + 1;
     }
 
     setProgress(100);
     setLoading(false);
 
-    // Calculate overall grade
-    const averageScore = allResults.length > 0 ? totalScore / allResults.length : 0;
+    const averageScore =
+      allResults.length > 0
+        ? totalScore / allResults.length
+        : 0;
+
     let grade = 'A';
-    if (hazardousCounts.HAZARDOUS > 0) grade = 'F';
-    else if (hazardousCounts.MODERATE > allResults.length * 0.5) grade = 'C';
-    else if (hazardousCounts.MODERATE > 0) grade = 'B';
+
+    if (hazardousCounts.HAZARDOUS > 0) {
+      grade = 'F';
+    } else if (
+      hazardousCounts.MODERATE >
+      allResults.length * 0.5
+    ) {
+      grade = 'C';
+    } else if (hazardousCounts.MODERATE > 0) {
+      grade = 'B';
+    }
 
     setResult({
       grade,
-      safety_score: Math.round((10 - averageScore / 10) * 100) / 100,
+      safety_score:
+        Math.round((10 - averageScore / 10) * 100) / 100,
       ingredients: allResults,
       warnings,
       distribution: hazardousCounts,
@@ -77,7 +120,9 @@ function IngredientChecker() {
 
   const handleProfileToggle = (profileId) => {
     setSelectedProfiles((prev) =>
-      prev.includes(profileId) ? prev.filter((p) => p !== profileId) : [...prev, profileId]
+      prev.includes(profileId)
+        ? prev.filter((p) => p !== profileId)
+        : [...prev, profileId]
     );
   };
 
@@ -90,7 +135,10 @@ function IngredientChecker() {
   const topConcerns = result
     ? result.ingredients
         .filter((ing) => ing.safety_level !== 'SAFE')
-        .sort((a, b) => (b.ewg_score || 0) - (a.ewg_score || 0))
+        .sort(
+          (a, b) =>
+            (b.ewg_score || 0) - (a.ewg_score || 0)
+        )
         .slice(0, 5)
     : [];
 
@@ -99,27 +147,62 @@ function IngredientChecker() {
       style={{
         display: 'flex',
         minHeight: 'calc(100vh - 64px)',
-        backgroundColor: '#f8fafc',
+        backgroundColor: colors.background,
       }}
     >
-      {/* Left Panel: Input (40%) */}
+      {/* Left Panel */}
       <div
         style={{
           flex: '0 0 40%',
           padding: '40px',
-          backgroundColor: 'white',
-          borderRight: '1px solid #e2e8f0',
+          backgroundColor: colors.surface,
+          borderRight: `1px solid ${colors.border}`,
           overflowY: 'auto',
           maxHeight: 'calc(100vh - 64px)',
         }}
       >
-        <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '32px' }}>📋 Ingredient Checker</h1>
+        <div
+          style={{
+            display: 'inline-block',
+            padding: '6px 14px',
+            marginBottom: '16px',
+            borderRadius: '20px',
+            backgroundColor: colors.soft,
+            color: colors.muted,
+            fontSize: '12px',
+            fontWeight: 600,
+            letterSpacing: '0.4px',
+          }}
+        >
+          INGREDIENT ANALYSIS
+        </div>
+
+        <h1
+          style={{
+            fontSize: '30px',
+            fontWeight: 700,
+            marginBottom: '32px',
+            color: colors.deepEspresso,
+            letterSpacing: '-0.5px',
+          }}
+        >
+          Ingredient Checker
+        </h1>
 
         {/* Ingredient Textarea */}
-        <div style={{ marginBottom: '32px' }}>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: '#334155' }}>
+        <div style={{ marginBottom: '28px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginBottom: '8px',
+              color: colors.espresso,
+            }}
+          >
             Ingredients List
           </label>
+
           <textarea
             value={ingredientText}
             onChange={(e) => setIngredientText(e.target.value)}
@@ -128,45 +211,80 @@ function IngredientChecker() {
             style={{
               width: '100%',
               height: '150px',
-              padding: '12px',
+              padding: '13px 14px',
               borderRadius: '8px',
-              border: '1px solid #cbd5e1',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: '#FFFFFF',
+              color: colors.espresso,
               fontSize: '14px',
-              fontFamily: 'Segoe UI, -apple-system, sans-serif',
+              fontFamily: 'DM Sans, sans-serif',
               boxSizing: 'border-box',
               resize: 'none',
+              outline: 'none',
+              lineHeight: 1.6,
             }}
           />
-          <p style={{ fontSize: '12px', color: '#64748b', marginTop: '6px' }}>
-            Paste or type ingredients separated by commas (Ctrl+Enter to analyze)
+
+          <p
+            style={{
+              fontSize: '12px',
+              color: colors.muted,
+              marginTop: '7px',
+              lineHeight: 1.5,
+            }}
+          >
+            Paste or type ingredients separated by commas.
+            Use Ctrl+Enter to analyze.
           </p>
         </div>
 
         {/* Example Buttons */}
-        <div style={{ marginBottom: '32px' }}>
-          <p style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Quick Examples:</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ marginBottom: '28px' }}>
+          <p
+            style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              color: colors.muted,
+              marginBottom: '9px',
+            }}
+          >
+            Quick Examples
+          </p>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '7px',
+            }}
+          >
             {exampleIngredients.map((example, idx) => (
               <button
                 key={idx}
                 onClick={() => setIngredientText(example.name)}
                 style={{
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  border: '1px solid #e2e8f0',
-                  backgroundColor: 'white',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: colors.surface,
+                  color: colors.espresso,
                   fontSize: '12px',
+                  fontWeight: 500,
                   cursor: 'pointer',
                   textAlign: 'left',
-                  transition: 'all 0.2s',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#eef2ff';
-                  e.target.style.borderColor = '#6366f1';
+                  e.currentTarget.style.backgroundColor =
+                    colors.soft;
+                  e.currentTarget.style.borderColor =
+                    colors.accent;
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'white';
-                  e.target.style.borderColor = '#e2e8f0';
+                  e.currentTarget.style.backgroundColor =
+                    colors.surface;
+                  e.currentTarget.style.borderColor =
+                    colors.border;
                 }}
               >
                 {example.label}
@@ -176,32 +294,77 @@ function IngredientChecker() {
         </div>
 
         {/* Profile Selection */}
-        <div style={{ marginBottom: '32px' }}>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#334155' }}>
+        <div style={{ marginBottom: '30px' }}>
+          <label
+            style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginBottom: '8px',
+              color: colors.espresso,
+            }}
+          >
             Your Health Profile
           </label>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+          <p
+            style={{
+              fontSize: '12px',
+              color: colors.muted,
+              marginBottom: '12px',
+            }}
+          >
+            Select all that apply.
+          </p>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+            }}
+          >
             {profiles.map((profile) => (
               <label
                 key={profile.id}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px',
-                  borderRadius: '6px',
+                  gap: '10px',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  backgroundColor: selectedProfiles.includes(profile.id) ? '#eef2ff' : 'transparent',
-                  transition: 'background-color 0.2s',
+                  backgroundColor:
+                    selectedProfiles.includes(profile.id)
+                      ? colors.soft
+                      : 'transparent',
+                  border: selectedProfiles.includes(profile.id)
+                    ? `1px solid ${colors.border}`
+                    : '1px solid transparent',
+                  transition: 'all 0.2s ease',
+                  color: colors.espresso,
                 }}
               >
                 <input
                   type="checkbox"
                   checked={selectedProfiles.includes(profile.id)}
-                  onChange={() => handleProfileToggle(profile.id)}
-                  style={{ cursor: 'pointer' }}
+                  onChange={() =>
+                    handleProfileToggle(profile.id)
+                  }
+                  style={{
+                    cursor: 'pointer',
+                    accentColor: colors.espresso,
+                  }}
                 />
-                <span style={{ fontSize: '14px' }}>{profile.label}</span>
+
+                <span
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 500,
+                  }}
+                >
+                  {profile.label}
+                </span>
               </label>
             ))}
           </div>
@@ -213,30 +376,38 @@ function IngredientChecker() {
           disabled={loading}
           style={{
             width: '100%',
-            padding: '12px',
-            backgroundColor: loading ? '#cbd5e1' : '#6366f1',
-            color: 'white',
+            padding: '14px',
+            backgroundColor: loading
+              ? colors.disabled
+              : colors.espresso,
+            color: colors.surface,
             border: 'none',
             borderRadius: '8px',
-            fontSize: '16px',
+            fontSize: '15px',
             fontWeight: 600,
             cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
             if (!loading) {
-              e.target.style.backgroundColor = '#4f46e5';
-              e.target.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.backgroundColor =
+                colors.deepEspresso;
+              e.currentTarget.style.transform =
+                'translateY(-1px)';
             }
           }}
           onMouseLeave={(e) => {
             if (!loading) {
-              e.target.style.backgroundColor = '#6366f1';
-              e.target.style.transform = 'translateY(0)';
+              e.currentTarget.style.backgroundColor =
+                colors.espresso;
+              e.currentTarget.style.transform =
+                'translateY(0)';
             }
           }}
         >
-          {loading ? `🔄 Analyzing ${Math.round(progress)}%` : '✨ Analyze Ingredients'}
+          {loading
+            ? `Analyzing ${Math.round(progress)}%`
+            : 'Analyze Ingredients'}
         </button>
 
         {/* Progress Bar */}
@@ -246,7 +417,7 @@ function IngredientChecker() {
               style={{
                 width: '100%',
                 height: '6px',
-                backgroundColor: '#e2e8f0',
+                backgroundColor: colors.border,
                 borderRadius: '3px',
                 overflow: 'hidden',
               }}
@@ -254,7 +425,7 @@ function IngredientChecker() {
               <div
                 style={{
                   height: '100%',
-                  backgroundColor: '#6366f1',
+                  backgroundColor: colors.espresso,
                   width: `${progress}%`,
                   transition: 'width 0.3s ease',
                 }}
@@ -264,7 +435,7 @@ function IngredientChecker() {
         )}
       </div>
 
-      {/* Right Panel: Results (60%) */}
+      {/* Right Panel */}
       <div
         style={{
           flex: '0 0 60%',
@@ -273,46 +444,154 @@ function IngredientChecker() {
           maxHeight: 'calc(100vh - 64px)',
         }}
       >
+        {/* Error */}
         {error && (
           <div
             style={{
               padding: '16px',
-              backgroundColor: '#fee2e2',
-              borderLeft: '4px solid #ef4444',
+              backgroundColor: '#FCE8E6',
+              borderLeft: '4px solid #B94A48',
               borderRadius: '8px',
               marginBottom: '24px',
             }}
           >
-            <p style={{ margin: 0, color: '#991b1b', fontSize: '14px' }}>❌ {error}</p>
+            <p
+              style={{
+                margin: 0,
+                color: '#8A302E',
+                fontSize: '14px',
+              }}
+            >
+              {error}
+            </p>
           </div>
         )}
 
-        {result && (
+        {/* Loading */}
+        {loading && (
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '100px 20px',
+            }}
+          >
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                border: `3px solid ${colors.border}`,
+                borderTop: `3px solid ${colors.espresso}`,
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 16px',
+              }}
+            />
+
+            <p
+              style={{
+                color: colors.muted,
+                fontSize: '16px',
+              }}
+            >
+              Analyzing ingredients...
+            </p>
+          </div>
+        )}
+
+        {/* Results */}
+        {result && !loading && (
           <div>
-            {/* Header with Grade */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '28px', fontWeight: 700, margin: 0 }}>Analysis Results</h2>
-              <GradeBadge grade={result.grade} size="lg" score={result.safety_score} />
+            {/* Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '32px',
+                gap: '20px',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: colors.muted,
+                    letterSpacing: '0.5px',
+                    marginBottom: '7px',
+                  }}
+                >
+                  ANALYSIS COMPLETE
+                </div>
+
+                <h2
+                  style={{
+                    fontSize: '28px',
+                    fontWeight: 700,
+                    margin: 0,
+                    color: colors.deepEspresso,
+                  }}
+                >
+                  Analysis Results
+                </h2>
+              </div>
+
+              <GradeBadge
+                grade={result.grade}
+                size="lg"
+                score={result.safety_score}
+              />
             </div>
 
             {/* Top Concerns */}
             {topConcerns.length > 0 && (
               <div style={{ marginBottom: '32px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>Top Concerns</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    marginBottom: '16px',
+                    color: colors.espresso,
+                  }}
+                >
+                  Top Concerns
+                </h3>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
                   {topConcerns.map((ingredient, idx) => (
                     <div
                       key={idx}
                       style={{
-                        padding: '12px',
-                        backgroundColor: '#fff5f5',
-                        borderLeft: '4px solid #ef4444',
-                        borderRadius: '6px',
+                        padding: '14px 16px',
+                        backgroundColor: '#F8EDEC',
+                        borderLeft: '4px solid #B94A48',
+                        borderRadius: '8px',
                       }}
                     >
-                      <div style={{ fontWeight: 600, color: '#991b1b' }}>{ingredient.name}</div>
-                      <div style={{ fontSize: '12px', color: '#be123c', marginTop: '4px' }}>
-                        EWG Score: {ingredient.ewg_score}/10 • {ingredient.safety_level}
+                      <div
+                        style={{
+                          fontWeight: 600,
+                          color: '#7F302E',
+                        }}
+                      >
+                        {ingredient.name}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: '#9B4B49',
+                          marginTop: '4px',
+                        }}
+                      >
+                        EWG Score: {ingredient.ewg_score}/10 •{' '}
+                        {ingredient.safety_level}
                       </div>
                     </div>
                   ))}
@@ -323,28 +602,94 @@ function IngredientChecker() {
             {/* Safety Distribution */}
             <div
               style={{
-                padding: '16px',
-                backgroundColor: '#f1f5f9',
-                borderRadius: '8px',
+                padding: '22px',
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '12px',
                 marginBottom: '32px',
               }}
             >
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <h3
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: colors.espresso,
+                  marginBottom: '18px',
+                }}
+              >
+                Safety Distribution
+              </h3>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns:
+                    'repeat(3, 1fr)',
+                  gap: '16px',
+                }}
+              >
                 <div>
-                  <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Safe</div>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: '#22c55e' }}>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: colors.muted,
+                      marginBottom: '4px',
+                    }}
+                  >
+                    Safe
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: '26px',
+                      fontWeight: 700,
+                      color: '#4F8061',
+                    }}
+                  >
                     {result.distribution.SAFE}
                   </div>
                 </div>
+
                 <div>
-                  <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Moderate</div>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: '#f59e0b' }}>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: colors.muted,
+                      marginBottom: '4px',
+                    }}
+                  >
+                    Moderate
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: '26px',
+                      fontWeight: 700,
+                      color: '#A87532',
+                    }}
+                  >
                     {result.distribution.MODERATE}
                   </div>
                 </div>
+
                 <div>
-                  <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>Hazardous</div>
-                  <div style={{ fontSize: '24px', fontWeight: 700, color: '#ef4444' }}>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: colors.muted,
+                      marginBottom: '4px',
+                    }}
+                  >
+                    Hazardous
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: '26px',
+                      fontWeight: 700,
+                      color: '#A94A47',
+                    }}
+                  >
                     {result.distribution.HAZARDOUS}
                   </div>
                 </div>
@@ -354,31 +699,99 @@ function IngredientChecker() {
             {/* All Ingredients */}
             {result.ingredients.length > 0 && (
               <div>
-                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px' }}>
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    marginBottom: '16px',
+                    color: colors.espresso,
+                  }}
+                >
                   All Ingredients ({result.ingredients.length})
                 </h3>
+
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gridTemplateColumns:
+                      'repeat(auto-fill, minmax(280px, 1fr))',
                     gap: '16px',
                   }}
                 >
-                  {result.ingredients.map((ingredient, idx) => (
-                    <IngredientCard key={idx} ingredient={ingredient} />
-                  ))}
+                  {result.ingredients.map(
+                    (ingredient, idx) => (
+                      <IngredientCard
+                        key={idx}
+                        ingredient={ingredient}
+                      />
+                    )
+                  )}
                 </div>
               </div>
             )}
           </div>
         )}
 
+        {/* Empty State */}
         {!result && !loading && !error && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b' }}>
-            <p style={{ fontSize: '16px' }}>Enter ingredients on the left to analyze them</p>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '100px 20px',
+              color: colors.muted,
+            }}
+          >
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                margin: '0 auto 24px',
+                borderRadius: '50%',
+                backgroundColor: colors.soft,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: colors.espresso,
+                fontSize: '18px',
+                fontWeight: 700,
+                letterSpacing: '1px',
+              }}
+            >
+              IQ
+            </div>
+
+            <h3
+              style={{
+                color: colors.espresso,
+                fontSize: '20px',
+                marginBottom: '8px',
+              }}
+            >
+              Ready to analyze
+            </h3>
+
+            <p
+              style={{
+                fontSize: '14px',
+                maxWidth: '380px',
+                margin: '0 auto',
+                lineHeight: 1.6,
+              }}
+            >
+              Enter ingredients on the left to see their
+              safety analysis and personalized insights.
+            </p>
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
   );
 }

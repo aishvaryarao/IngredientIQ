@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -11,18 +11,18 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f8fafc;
-  color: #1e293b;
+  font-family: 'DM Sans', sans-serif;
+  background-color: #f4ede3;
+  color: #3a2921;
 }
 
 /* Card styles */
 .card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: #fbf8f3;
+  border: 1px solid #dccfc2;
+  border-radius: 14px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(58, 41, 33, 0.06);
 }
 
 .card-sm {
@@ -35,7 +35,7 @@ body {
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Button styles */
@@ -44,40 +44,40 @@ body {
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   padding: 12px 24px;
   cursor: pointer;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .btn-primary {
-  background-color: #6366f1;
-  color: white;
+  background-color: #3a2921;
+  color: #fbf8f3;
 }
 
 .btn-primary:hover {
-  background-color: #4f46e5;
+  background-color: #291b16;
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 10px rgba(58, 41, 33, 0.18);
 }
 
 .btn-primary:disabled {
-  background-color: #cbd5e1;
+  background-color: #c9bdb2;
   cursor: not-allowed;
   transform: none;
 }
 
 .btn-secondary {
-  background-color: white;
-  color: #6366f1;
-  border: 1px solid #6366f1;
+  background-color: #fbf8f3;
+  color: #3a2921;
+  border: 1px solid #8d7568;
 }
 
 .btn-secondary:hover {
-  background-color: #eef2ff;
+  background-color: #ede1d4;
 }
 
 .btn-sm {
@@ -96,13 +96,14 @@ body {
   0%, 100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.4;
   }
 }
 
 .skeleton {
-  background-color: #e2e8f0;
+  background-color: #e4d9cd;
   border-radius: 8px;
   animation: skeleton-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -117,8 +118,8 @@ body {
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid #e2e8f0;
-  border-top-color: #6366f1;
+  border: 2px solid #dccfc2;
+  border-top-color: #3a2921;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -126,8 +127,8 @@ body {
 .spinner-lg {
   width: 40px;
   height: 40px;
-  border: 3px solid #e2e8f0;
-  border-top-color: #6366f1;
+  border: 3px solid #dccfc2;
+  border-top-color: #3a2921;
 }
 
 /* Pulsing animation for danger state */
@@ -135,6 +136,7 @@ body {
   0%, 100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -192,8 +194,8 @@ body {
 }
 
 .label-unknown {
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: #eee8e1;
+  color: #6b5a50;
 }
 
 /* Warning severity colors */
@@ -228,14 +230,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #ede4da;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #b9a99c;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #8d7568;
 }
